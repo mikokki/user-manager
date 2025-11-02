@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getAuditLogs } from '../services/auditService';
 import { useError } from '../context/ErrorContext';
 
@@ -6,7 +6,6 @@ const Audit = () => {
   const [auditLogs, setAuditLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const consoleEndRef = useRef(null);
   const { showError } = useError();
 
   const fetchAuditLogs = async () => {
@@ -36,11 +35,6 @@ const Audit = () => {
       if (interval) clearInterval(interval);
     };
   }, [autoRefresh]);
-
-  useEffect(() => {
-    // Auto-scroll to bottom when new logs arrive
-    consoleEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [auditLogs]);
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -148,7 +142,6 @@ const Audit = () => {
                 </div>
               ))
             )}
-            <div ref={consoleEndRef} />
           </div>
         </div>
       )}
