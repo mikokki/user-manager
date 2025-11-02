@@ -29,11 +29,17 @@ authAPI.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // User is no longer authenticated (token invalid or user deleted)
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Reload to trigger re-render and redirect to login
-      window.location.href = '/login';
+      // Don't redirect for login/register endpoints (these are expected to return 401 on failure)
+      const isAuthEndpoint = error.config?.url?.includes('/login') ||
+                             error.config?.url?.includes('/register');
+
+      if (!isAuthEndpoint) {
+        // User is no longer authenticated (token invalid or user deleted)
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Reload to trigger re-render and redirect to login
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }

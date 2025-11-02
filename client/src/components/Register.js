@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { register } from '../services/authService';
-import { useError } from '../context/ErrorContext';
 
 const Register = ({ onLogin }) => {
   const [formData, setFormData] = useState({
@@ -17,10 +16,14 @@ const Register = ({ onLogin }) => {
     zipCode: '',
   });
   const [loading, setLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState(null);
   const navigate = useNavigate();
-  const { showError } = useError();
 
   const handleChange = (e) => {
+    // Clear error when user starts typing
+    if (registrationError) {
+      setRegistrationError(null);
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -29,16 +32,19 @@ const Register = ({ onLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setRegistrationError(null);
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      showError('Passwords do not match', 'Validation Error');
+      const errorMessage = 'Passwords do not match';
+      setRegistrationError(errorMessage);
       return;
     }
 
     // Validate password length
     if (formData.password.length < 6) {
-      showError('Password must be at least 6 characters', 'Validation Error');
+      const errorMessage = 'Password must be at least 6 characters';
+      setRegistrationError(errorMessage);
       return;
     }
 
@@ -51,7 +57,8 @@ const Register = ({ onLogin }) => {
       onLogin(response.data);
       navigate('/users');
     } catch (err) {
-      showError(err.message || 'Registration failed. Please try again.', 'Registration Failed');
+      const errorMessage = err.message || 'Registration failed. Please try again.';
+      setRegistrationError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -62,6 +69,24 @@ const Register = ({ onLogin }) => {
       <div className="login-card">
         <h2>Register</h2>
         <p className="subtitle">Create a new account</p>
+
+        {registrationError && (
+          <div className="login-error-message">
+            <svg
+              className="error-icon"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>{registrationError}</span>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
