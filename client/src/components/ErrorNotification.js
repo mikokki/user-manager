@@ -5,12 +5,12 @@ import './ErrorNotification.css';
 const ErrorNotification = () => {
   const { error, clearError } = useError();
 
-  // Auto-dismiss after 5 seconds
+  // Auto-dismiss after 10 seconds
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
         clearError();
-      }, 5000);
+      }, 10000);
 
       return () => clearTimeout(timer);
     }
