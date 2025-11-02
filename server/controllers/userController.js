@@ -186,28 +186,52 @@ const updateUser = async (req, res, next) => {
 // @access  Public
 const deleteUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    // Check if user exists first (before deletion)
+    const userToDelete = await User.findById(req.params.id);
 
-    if (!user) {
+    if (!userToDelete) {
       return res.status(404).json({
         success: false,
         message: 'User not found',
       });
     }
 
+    // Prevent self-deletion
+    if (req.user._id.toString() === req.params.id) {
+      return res.status(403).json({
+        success: false,
+        message: 'You cannot delete your own account. Please contact another administrator.',
+      });
+    }
+
+    // If deleting an admin, check if they're the last admin
+    if (userToDelete.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(403).json({
+          success: false,
+          message: 'Cannot delete the last administrator account. System must have at least one admin.',
+        });
+      }
+    }
+
+    // Proceed with deletion
+    const user = await User.findByIdAndDelete(req.params.id);
+
     // Create audit log entry
     await AuditLog.create({
       action: 'DELETE',
       entityType: 'USER',
       entityId: user._id,
-      userEmail: user.email,
-      userName: `${user.firstName} ${user.lastName}`,
+      userEmail: req.user.email,
+      userName: `${req.user.firstName} ${req.user.lastName}`,
       details: {
         deletedUser: {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
           status: user.status,
+          role: user.role,
         },
       },
     });

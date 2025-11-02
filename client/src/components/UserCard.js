@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getStoredUser } from '../services/authService';
 
 const UserCard = ({ user, onDelete }) => {
   const navigate = useNavigate();
+  const currentUser = getStoredUser();
 
   const handleEdit = () => {
     navigate(`/users/edit/${user._id}`);
@@ -13,7 +15,14 @@ const UserCard = ({ user, onDelete }) => {
   };
 
   const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
+    // Check if trying to delete own account
+    const isSelf = currentUser && currentUser._id === user._id;
+
+    const confirmMessage = isSelf
+      ? `WARNING: You are about to delete your own account!\n\nThis will log you out immediately and you will lose access to the system.\n\nAre you absolutely sure you want to delete your account (${user.firstName} ${user.lastName})?`
+      : `Are you sure you want to delete ${user.firstName} ${user.lastName}?`;
+
+    if (window.confirm(confirmMessage)) {
       onDelete(user._id);
     }
   };

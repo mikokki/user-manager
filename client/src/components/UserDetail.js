@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getUserById, deleteUser } from '../services/userService';
+import { getStoredUser } from '../services/authService';
 import { useError } from '../context/ErrorContext';
 
 const UserDetail = () => {
@@ -32,7 +33,14 @@ const UserDetail = () => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
+    const currentUser = getStoredUser();
+    const isSelf = currentUser && currentUser._id === user._id;
+
+    const confirmMessage = isSelf
+      ? `WARNING: You are about to delete your own account!\n\nThis will log you out immediately and you will lose access to the system.\n\nAre you absolutely sure you want to delete your account (${user.firstName} ${user.lastName})?`
+      : `Are you sure you want to delete ${user.firstName} ${user.lastName}?`;
+
+    if (window.confirm(confirmMessage)) {
       try {
         await deleteUser(id);
         navigate('/users');

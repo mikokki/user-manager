@@ -17,21 +17,21 @@ const UserList = () => {
   });
   const { showError } = useError();
 
+  // Fetch users when pagination changes or when search is cleared
   useEffect(() => {
-    fetchUsers();
-  }, [currentPage, limit]);
+    if (!searchTerm.trim()) {
+      fetchUsers();
+    }
+  }, [currentPage, limit, searchTerm]);
 
+  // Debounce search input only
   useEffect(() => {
-    // Debounce search to avoid too many API calls
-    const timeoutId = setTimeout(() => {
-      if (searchTerm.trim()) {
+    if (searchTerm.trim()) {
+      const timeoutId = setTimeout(() => {
         handleSearch();
-      } else {
-        fetchUsers();
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
   }, [searchTerm]);
 
   const fetchUsers = async () => {
