@@ -326,13 +326,11 @@ REACT_APP_API_URL=http://localhost:5000/api
 npm run setup         # Interactive setup script - create admin user
 npm start             # Start the server
 npm run dev           # Start with nodemon (auto-reload)
-npm test              # Run tests
 ```
 
 ### Client
 ```bash
 npm start             # Start development server
 npm run build         # Build for production
-npm test              # Run tests
 npm eject             # Eject from Create React App (⚠️ irreversible)
 ```
