@@ -345,7 +345,7 @@ The frontend will run on `http://localhost:3000`
 
 ### Dummy Users
 
-The setup script can optionally seed dummy users:
+The setup script can optionally seed dummy users
 
 ## Environment Variables
 
