@@ -91,14 +91,7 @@ Once the server is running, you can access the interactive API documentation at:
 
 **Swagger UI**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 
-The Swagger UI provides:
-- Complete API endpoint documentation
-- Request/Response schemas
-- Authentication (JWT Bearer token support)
-- Interactive "Try it out" feature to test endpoints directly
-- Model schemas for all data structures
-
-You can also access the raw Swagger JSON specification at: [http://localhost:5000/api-docs.json](http://localhost:5000/api-docs.json)
+Raw Swagger JSON at: [http://localhost:5000/api-docs.json](http://localhost:5000/api-docs.json)
 
 ## API Endpoints
 

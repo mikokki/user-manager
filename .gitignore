@@ -70,7 +70,6 @@ pnpm-lock.yaml
 *.db
 *.sqlite
 *.sqlite3
-data/
 
 # Optional npm cache
 .npm/

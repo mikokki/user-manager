@@ -4,6 +4,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') }
 const mongoose = require('mongoose');
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
+const dummyUsers = require('../data/dummyUsers');
 
 // ANSI color codes for better terminal output
 const colors = {
@@ -99,45 +100,6 @@ const seedDummyUsers = async () => {
   try {
     console.log(`\n${colors.blue}→${colors.reset} Seeding dummy users...`);
 
-    const dummyUsers = [
-      {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com',
-        password: 'password123',
-        phone: '+1-555-0101',
-        address: '123 Main St',
-        city: 'New York',
-        state: 'NY',
-        zipCode: '10001',
-        role: 'user',
-      },
-      {
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'jane.smith@example.com',
-        password: 'password123',
-        phone: '+1-555-0102',
-        address: '456 Oak Ave',
-        city: 'Los Angeles',
-        state: 'CA',
-        zipCode: '90001',
-        role: 'user',
-      },
-      {
-        firstName: 'Bob',
-        lastName: 'Johnson',
-        email: 'bob.johnson@example.com',
-        password: 'password123',
-        phone: '+1-555-0103',
-        address: '789 Pine Rd',
-        city: 'Chicago',
-        state: 'IL',
-        zipCode: '60601',
-        role: 'user',
-      },
-    ];
-
     let created = 0;
     let skipped = 0;
 
@@ -160,7 +122,7 @@ const seedDummyUsers = async () => {
 // Main setup function
 const runSetup = async () => {
   console.log(`\n${colors.bright}${colors.blue}╔════════════════════════════════════════════╗${colors.reset}`);
-  console.log(`${colors.bright}${colors.blue}║   User Manager - Initial Setup Script     ║${colors.reset}`);
+  console.log(`${colors.bright}${colors.blue}║   User Manager - Initial Setup Script      ║${colors.reset}`);
   console.log(`${colors.bright}${colors.blue}╚════════════════════════════════════════════╝${colors.reset}\n`);
 
   try {
