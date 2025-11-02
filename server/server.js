@@ -1,6 +1,14 @@
 require('dotenv').config();
+
+// Validate environment variables before doing anything else
+const validateEnv = require('./config/validateEnv');
+validateEnv();
+
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const connectDB = require('./config/db');
@@ -8,6 +16,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const auditRoutes = require('./routes/audit');
+const healthRoutes = require('./routes/health');
 
 // Initialize express app
 const app = express();
@@ -15,13 +24,25 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Security Middleware
+// Set security HTTP headers
+app.use(helmet());
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
+
+// Body parser middleware
+app.use(express.json({ limit: '100kb' })); // Limit body size to prevent DoS
+app.use(express.urlencoded({ extended: true, limit: '100kb' }));
+
+// CORS
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: process.env.CORS_ORIGIN,
   credentials: true,
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Request logging middleware (development)
 if (process.env.NODE_ENV === 'development') {
@@ -44,6 +65,7 @@ app.get('/api-docs.json', (req, res) => {
 });
 
 // Routes
+app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/audit', auditRoutes);
@@ -55,6 +77,7 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     documentation: `${req.protocol}://${req.get('host')}/api-docs`,
     endpoints: {
+      health: '/api/health',
       auth: '/api/auth',
       users: '/api/users',
       userById: '/api/users/:id',

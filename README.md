@@ -6,6 +6,22 @@ A full-stack web application for managing users with JWT authentication, React f
 
 This project demonstrates a complete CRUD (Create, Read, Update, Delete) application built with modern web technologies. Users can view, add, modify, update, and remove user records through an intuitive React interface, with all operations persisted in MongoDB.
 
+## Security Features
+
+This application implements multiple layers of security best practices:
+
+- **Environment Variable Validation** - Server validates all required environment variables on startup, preventing misconfiguration
+- **JWT Secret Enforcement** - No hardcoded fallback secrets; fails fast if JWT_SECRET is not properly configured
+- **Rate Limiting** - Protection against brute force attacks on authentication endpoints (10 attempts per 15 minutes)
+- **Security Headers** - Helmet middleware sets secure HTTP headers (CSP, HSTS, X-Frame-Options, etc.)
+- **NoSQL Injection Protection** - Input sanitization prevents MongoDB injection attacks
+- **XSS Protection** - Content sanitization prevents cross-site scripting attacks
+- **Password Security** - Bcrypt hashing with salt rounds, minimum length requirements
+- **Role-Based Access Control** - Admin and user roles with proper authorization checks
+- **Audit Logging** - Complete audit trail of all CREATE, UPDATE, DELETE operations
+- **Request Size Limiting** - Body size limited to 100kb
+- **Token Expiration** - JWT tokens expire after configurable duration (default 7 days)
+
 ## Tech Stack
 
 ### Frontend
@@ -22,6 +38,13 @@ This project demonstrates a complete CRUD (Create, Read, Update, Delete) applica
 - **JWT (jsonwebtoken)** - Token-based authentication
 - **bcryptjs** - Password hashing
 - **Swagger** - API documentation (swagger-ui-express, swagger-jsdoc)
+
+#### Security
+- **helmet** - Security headers middleware
+- **express-rate-limit** - Rate limiting to prevent brute force attacks
+- **express-mongo-sanitize** - Protection against NoSQL injection
+- **xss-clean** - Protection against XSS attacks
+- **validator** - Enhanced email and input validation
 
 ## Project Structure
 
@@ -95,14 +118,19 @@ Raw Swagger JSON at: [http://localhost:5000/api-docs.json](http://localhost:5000
 
 ## API Endpoints
 
-### Authentication
+### System
 | Method | Endpoint | Description | Access |
 |--------|----------|-------------|--------|
-| POST | `/api/auth/register` | Register new user | Public |
-| POST | `/api/auth/login` | Login user | Public |
-| GET | `/api/auth/me` | Get current user | Private |
-| PUT | `/api/auth/profile` | Update profile | Private |
-| PUT | `/api/auth/password` | Change password | Private |
+| GET | `/api/health` | Health check endpoint | Public |
+
+### Authentication
+| Method | Endpoint | Description | Access | Rate Limit |
+|--------|----------|-------------|--------|------------|
+| POST | `/api/auth/register` | Register new user | Public | 10 requests/15min |
+| POST | `/api/auth/login` | Login user | Public | 10 requests/15min |
+| GET | `/api/auth/me` | Get current user | Private | - |
+| PUT | `/api/auth/profile` | Update profile | Private | - |
+| PUT | `/api/auth/password` | Change password | Private | - |
 
 ### Users
 | Method | Endpoint | Description | Access |
@@ -189,7 +217,18 @@ cd server
 npm install
 ```
 
-3. Create a `.env` file in the server directory:
+3. Create a `.env` file in the server directory (see `.env.example` for reference):
+```bash
+cp .env.example .env
+```
+
+4. **IMPORTANT: Generate a secure JWT secret:**
+```bash
+# Generate a cryptographically secure secret key
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+Copy the generated key and update your `.env` file:
 ```env
 MONGODB_URI=mongodb://localhost:27017/user-manager
 PORT=5000
@@ -197,11 +236,14 @@ NODE_ENV=development
 CORS_ORIGIN=http://localhost:3000
 
 # JWT Configuration
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-123456789
+# REPLACE WITH YOUR GENERATED SECRET KEY
+JWT_SECRET=<paste-your-generated-secret-here>
 JWT_EXPIRE=7d
 ```
 
-4. Run the setup script to create admin user and seed data (in cd server):
+**Security Note:** The server will validate your JWT_SECRET on startup. Weak or default secrets will trigger warnings in development and cause startup failure in production.
+
+5. Run the setup script to create admin user and seed data:
 ```bash
 npm run setup
 ```
@@ -216,7 +258,7 @@ This will automatically:
 - Email: `admin@example.com`
 - Password: `admin123`
 
-5. Start the server:
+6. Start the server:
 ```bash
 npm start
 # or for development with auto-reload
@@ -237,7 +279,12 @@ cd client
 npm install
 ```
 
-3. Create a `.env` file in the client directory:
+3. Create a `.env` file in the client directory (see `.env.example` for reference):
+```bash
+cp .env.example .env
+```
+
+The file should contain:
 ```
 REACT_APP_API_URL=http://localhost:5000/api
 ```

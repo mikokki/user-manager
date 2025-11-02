@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema(
   {
@@ -20,10 +21,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      match: [
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        'Please provide a valid email address',
-      ],
+      validate: {
+        validator: function (email) {
+          return validator.isEmail(email);
+        },
+        message: 'Please provide a valid email address',
+      },
     },
     password: {
       type: String,
@@ -100,7 +103,7 @@ userSchema.methods.generateAuthToken = function () {
       email: this.email,
       role: this.role
     },
-    process.env.JWT_SECRET || 'your-secret-key-change-this-in-production',
+    process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRE || '7d' }
   );
   return token;
