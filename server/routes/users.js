@@ -99,7 +99,7 @@ router.post('/seed', protect, authorize('admin'), seedUsers);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/search', protect, searchUsers);
+router.get('/search', protect, authorize('admin'), searchUsers);
 
 /**
  * @swagger
@@ -223,7 +223,7 @@ router.get('/search', protect, searchUsers);
  *               $ref: '#/components/schemas/Error'
  */
 router.route('/')
-  .get(protect, getUsers)
+  .get(protect, authorize('admin'), getUsers)
   .post(protect, authorize('admin'), createUser);
 
 /**

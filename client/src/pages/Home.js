@@ -44,11 +44,11 @@ const Home = ({ user }) => {
 
         {user ? (
           <div className="hero-actions">
-            <Link to="/users" className="btn btn-primary btn-large">
-              View All Users
-            </Link>
-            {user.role === 'admin' && (
+            {user.role === 'admin' ? (
               <>
+                <Link to="/users" className="btn btn-primary btn-large">
+                  View All Users
+                </Link>
                 <Link to="/users/new" className="btn btn-success btn-large">
                   Add New User
                 </Link>
@@ -60,6 +60,10 @@ const Home = ({ user }) => {
                   {seeding ? 'Seeding...' : 'Seed Database'}
                 </button>
               </>
+            ) : (
+              <Link to="/profile" className="btn btn-primary btn-large">
+                View My Profile
+              </Link>
             )}
           </div>
         ) : (

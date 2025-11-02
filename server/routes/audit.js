@@ -4,7 +4,7 @@ const {
   getAuditLogs,
   getAuditLogsByEntity,
 } = require('../controllers/auditController');
-const { protect } = require('../middleware/auth');
+const { protect, authorize } = require('../middleware/auth');
 
 /**
  * @swagger
@@ -61,7 +61,7 @@ const { protect } = require('../middleware/auth');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/', protect, getAuditLogs);
+router.get('/', protect, authorize('admin'), getAuditLogs);
 
 /**
  * @swagger
@@ -117,6 +117,6 @@ router.get('/', protect, getAuditLogs);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.get('/entity/:id', protect, getAuditLogsByEntity);
+router.get('/entity/:id', protect, authorize('admin'), getAuditLogsByEntity);
 
 module.exports = router;

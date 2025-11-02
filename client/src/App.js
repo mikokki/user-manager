@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Users from './pages/Users';
 import Audit from './pages/Audit';
 import About from './pages/About';
+import Profile from './pages/Profile';
 import UserForm from './components/UserForm';
 import UserDetail from './components/UserDetail';
 import Login from './components/Login';
@@ -49,9 +50,17 @@ function App() {
 
               {/* Protected Routes */}
               <Route
-                path="/users"
+                path="/profile"
                 element={
                   <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute requireAdmin={true}>
                     <Users />
                   </ProtectedRoute>
                 }
@@ -75,7 +84,7 @@ function App() {
               <Route
                 path="/users/:id"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireAdmin={true}>
                     <UserDetail />
                   </ProtectedRoute>
                 }
@@ -83,7 +92,7 @@ function App() {
               <Route
                 path="/audit"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireAdmin={true}>
                     <Audit />
                   </ProtectedRoute>
                 }

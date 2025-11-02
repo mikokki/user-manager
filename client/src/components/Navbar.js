@@ -20,12 +20,20 @@ const Navbar = ({ user, onLogout }) => {
         </li>
         {user ? (
           <>
-            <li>
-              <Link to="/users">Users</Link>
-            </li>
-            <li>
-              <Link to="/audit">Audit</Link>
-            </li>
+            {user.role === 'admin' ? (
+              <>
+                <li>
+                  <Link to="/users">Users</Link>
+                </li>
+                <li>
+                  <Link to="/audit">Audit</Link>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link to="/profile">My Profile</Link>
+              </li>
+            )}
             <li>
               <Link to="/about">About</Link>
             </li>
