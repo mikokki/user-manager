@@ -24,6 +24,21 @@ authAPI.interceptors.request.use(
   }
 );
 
+// Handle 401 errors globally (user no longer exists or token invalid)
+authAPI.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // User is no longer authenticated (token invalid or user deleted)
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Reload to trigger re-render and redirect to login
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 /**
  * Register a new user
  * @param {Object} userData - User registration data

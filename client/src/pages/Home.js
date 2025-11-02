@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { seedUsers } from '../services/userService';
+import { useError } from '../context/ErrorContext';
 
 const Home = ({ user }) => {
   const [seeding, setSeeding] = React.useState(false);
   const [message, setMessage] = React.useState(null);
+  const { showError } = useError();
 
   const handleSeedDatabase = async () => {
     if (window.confirm('This will clear all existing users and add 10 dummy users. Continue?')) {
@@ -17,10 +19,7 @@ const Home = ({ user }) => {
         });
         setTimeout(() => setMessage(null), 5000);
       } catch (err) {
-        setMessage({
-          type: 'error',
-          text: err.message || 'Failed to seed database',
-        });
+        showError(err.message || 'Failed to seed database', 'Seed Database Error');
       } finally {
         setSeeding(false);
       }
@@ -36,7 +35,7 @@ const Home = ({ user }) => {
             : 'Welcome to User Manager'}
         </h1>
         <p className="subtitle">
-          A full-stack application for managing users with JWT authentication
+          A full-stack application for managing users
         </p>
 
         {message && (

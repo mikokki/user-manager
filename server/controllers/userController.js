@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const dummyUsers = require('../data/dummyUsers');
+const bcrypt = require('bcryptjs');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -264,16 +265,32 @@ const searchUsers = async (req, res, next) => {
 // @access  Public
 const seedUsers = async (req, res, next) => {
   try {
-    // Clear existing users
-    await User.deleteMany();
+    // Get all admin users to preserve them
+    const adminUsers = await User.find({ role: 'admin' });
+    const adminEmails = adminUsers.map(admin => admin.email);
 
-    // Insert dummy users
-    const users = await User.insertMany(dummyUsers);
+    // Clear only non-admin users
+    await User.deleteMany({ role: { $ne: 'admin' } });
+
+    // Filter out dummy users whose emails conflict with existing admins
+    const usersToInsert = dummyUsers.filter(user => !adminEmails.includes(user.email));
+
+    // Hash passwords before inserting
+    const usersWithHashedPasswords = await Promise.all(
+      usersToInsert.map(async (user) => {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(user.password, salt);
+        return { ...user, password: hashedPassword };
+      })
+    );
+
+    // Insert dummy users with hashed passwords
+    const users = await User.insertMany(usersWithHashedPasswords);
 
     res.status(201).json({
       success: true,
       count: users.length,
-      message: 'Database seeded successfully',
+      message: `Database seeded successfully. ${adminUsers.length} admin user(s) preserved.`,
       data: users,
     });
   } catch (error) {
