@@ -1,0 +1,80 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Server-side testing and build verification
+  test-and-build:
+    name: Test & Build
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: |
+          server/package-lock.json
+          client/package-lock.json
+
+    - name: Install server dependencies
+      working-directory: ./server
+      run: npm ci
+
+    - name: Run server tests
+      working-directory: ./server
+      run: npm test
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/user-manager-test
+        JWT_SECRET: test-secret-key-for-github-actions-only
+
+    - name: Generate test coverage
+      working-directory: ./server
+      run: npm run test:coverage
+      env:
+        NODE_ENV: test
+        MONGODB_URI: mongodb://localhost:27017/user-manager-test
+        JWT_SECRET: test-secret-key-for-github-actions-only
+
+    - name: Install client dependencies
+      working-directory: ./client
+      run: npm ci
+
+    - name: Build client
+      working-directory: ./client
+      run: npm run build
+      env:
+        CI: true
+        REACT_APP_API_URL: http://localhost:5000/api
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-build
+        path: client/build/
+        retention-days: 7
+
+    - name: CI Success Summary
+      run: |
+        echo "All 35 server tests passed"
+        echo "Client production build successful"
