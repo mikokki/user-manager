@@ -1,3 +1,5 @@
+[![CI](https://github.com/mikokki/user-manager/actions/workflows/ci.yml/badge.svg)](https://github.com/mikokki/user-manager/actions/workflows/ci.yml)
+
 # User Manager
 
 A full-stack web application for managing users with JWT authentication, React frontend, Node.js/Express backend, and MongoDB database.
