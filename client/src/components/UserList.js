@@ -6,7 +6,7 @@ import { useError } from '../context/ErrorContext';
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [pagination, setPagination] = useState({
@@ -19,7 +19,6 @@ const UserList = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      setLoading(true);
       const data = await getAllUsers(currentPage, limit);
       setUsers(data.data);
       setPagination(data.pagination);
@@ -29,13 +28,12 @@ const UserList = () => {
       // Set empty arrays on error
       setUsers([]);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   }, [currentPage, limit, showError]);
 
   const handleSearch = useCallback(async () => {
     try {
-      setLoading(true);
       const data = await searchUsers(searchTerm);
       setUsers(data.data);
       // Reset pagination when searching
@@ -50,8 +48,6 @@ const UserList = () => {
       showError(err.message || 'Failed to search users', 'Error Searching Users');
       console.error('Error searching users:', err);
       setUsers([]);
-    } finally {
-      setLoading(false);
     }
   }, [searchTerm, showError]);
 
@@ -86,7 +82,7 @@ const UserList = () => {
     }
   };
 
-  if (loading) {
+  if (initialLoading) {
     return <div className="loading">Loading users...</div>;
   }
 
