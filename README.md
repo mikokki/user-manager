@@ -343,10 +343,6 @@ The frontend will run on `http://localhost:3000`
 - **Admin**: Full access to create, update, and delete users
 - **Regular User**: Can view users and update their own profile
 
-### Dummy Users
-
-The setup script can optionally seed dummy users
-
 ## Environment Variables
 
 ### Server (.env)
