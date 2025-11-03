@@ -366,6 +366,51 @@ JWT_EXPIRE=7d
 REACT_APP_API_URL=http://localhost:5000/api
 ```
 
+## Testing
+
+This application includes **35 comprehensive automated tests**.
+
+### Running Tests
+
+```bash
+cd server
+npm test                    # Run all 35 tests (100% pass rate)
+npm run test:watch          # Run tests in watch mode (with file watching)
+npm run test:coverage       # Run tests with coverage report
+```
+
+**Test Coverage:**
+
+**Authentication Tests:**
+- User registration (success, validation, duplicate email)
+- User login (success, wrong password, inactive users)
+- Token validation and current user endpoint
+- Missing credentials and invalid tokens
+
+**User CRUD Tests:**
+- Get all users (admin authorization required)
+- Get user by ID with proper error handling
+- Create users (admin only, no duplicates)
+- Update users (admin only, authorization checks)
+- Delete users (prevent self-deletion, last admin protection)
+
+**Health Check Tests:**
+- Server status and database connection
+- Uptime tracking and ISO timestamps
+
+**Test Stack:**
+- **Jest** - Testing framework with watch mode support
+- **Supertest** - HTTP assertion library for API testing
+- **MongoDB** - Automatic test database (separate from development, auto-cleaned)
+
+### Test Database Setup
+
+Tests automatically use a separate database (`user-manager-test`) so they don't interfere with development data. The test database is automatically created and cleaned between test runs.
+
+**How it works:**
+- Test environment variables are configured in [tests/setup.js](server/tests/setup.js)
+- Each test suite has setup/teardown that creates and cleans the test database
+
 ## Scripts
 
 ### Server
@@ -373,6 +418,8 @@ REACT_APP_API_URL=http://localhost:5000/api
 npm run setup         # Interactive setup script - create admin user
 npm start             # Start the server
 npm run dev           # Start with nodemon (auto-reload)
+npm test              # Run test suite
+npm run test:coverage # Run tests with coverage report
 ```
 
 ### Client
