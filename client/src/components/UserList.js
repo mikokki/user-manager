@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import UserCard from './UserCard';
 import { getAllUsers, deleteUser, searchUsers } from '../services/userService';
 import { useError } from '../context/ErrorContext';
@@ -17,24 +17,7 @@ const UserList = () => {
   });
   const { showError } = useError();
 
-  // Fetch users when pagination changes or when search is cleared
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      fetchUsers();
-    }
-  }, [currentPage, limit, searchTerm]);
-
-  // Debounce search input only
-  useEffect(() => {
-    if (searchTerm.trim()) {
-      const timeoutId = setTimeout(() => {
-        handleSearch();
-      }, 500);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [searchTerm]);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAllUsers(currentPage, limit);
@@ -48,9 +31,9 @@ const UserList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, limit, showError]);
 
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     try {
       setLoading(true);
       const data = await searchUsers(searchTerm);
@@ -70,7 +53,24 @@ const UserList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, showError]);
+
+  // Fetch users when pagination changes or when search is cleared
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      fetchUsers();
+    }
+  }, [searchTerm, fetchUsers]);
+
+  // Debounce search input only
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      const timeoutId = setTimeout(() => {
+        handleSearch();
+      }, 500);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, handleSearch]);
 
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) {

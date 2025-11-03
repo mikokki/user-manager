@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getAuditLogs } from '../services/auditService';
 import { useError } from '../context/ErrorContext';
 
@@ -8,7 +8,7 @@ const Audit = () => {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const { showError } = useError();
 
-  const fetchAuditLogs = async () => {
+  const fetchAuditLogs = useCallback(async () => {
     try {
       const response = await getAuditLogs(100);
       setAuditLogs(response.data);
@@ -18,7 +18,7 @@ const Audit = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showError]);
 
   useEffect(() => {
     fetchAuditLogs();
@@ -34,7 +34,7 @@ const Audit = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [autoRefresh]);
+  }, [autoRefresh, fetchAuditLogs]);
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);

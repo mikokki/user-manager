@@ -176,16 +176,3 @@ export const isAdmin = () => {
   const user = getStoredUser();
   return user?.role === 'admin';
 };
-
-export default {
-  register,
-  login,
-  logout,
-  getCurrentUser,
-  updateProfile,
-  changePassword,
-  getToken,
-  getStoredUser,
-  isAuthenticated,
-  isAdmin,
-};
