@@ -47,6 +47,11 @@ const About = () => {
               <span className="description">Get user by ID</span>
             </div>
             <div className="api-item">
+              <span className="method get">GET</span>
+              <code>/api/health</code>
+              <span className="description">Server health</span>
+            </div>
+            <div className="api-item">
               <span className="method post">POST</span>
               <code>/api/users</code>
               <span className="description">Create new user</span>

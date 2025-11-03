@@ -96,9 +96,12 @@ const createUser = async (req, res, next) => {
       },
     });
 
+    // Re-fetch user without password
+    const userWithoutPassword = await User.findById(user._id);
+
     res.status(201).json({
       success: true,
-      data: user,
+      data: userWithoutPassword,
     });
   } catch (error) {
     if (error.code === 11000) {

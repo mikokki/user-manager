@@ -7,7 +7,16 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup": "node scripts/setup.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch --runInBand",
+    "test:coverage": "jest --coverage --runInBand --detectOpenHandles --forceExit"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testTimeout": 10000
   },
   "keywords": [
     "express",
@@ -32,6 +41,9 @@
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.1.4"
   }
 }

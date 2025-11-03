@@ -10,6 +10,9 @@ const {
 const { protect } = require('../middleware/auth');
 const { authLimiter } = require('../middleware/rateLimiter');
 
+// Disable rate limiting in test environment
+const applyRateLimiter = process.env.NODE_ENV === 'test' ? (req, res, next) => next() : authLimiter;
+
 /**
  * @swagger
  * /api/auth/register:
@@ -44,7 +47,7 @@ const { authLimiter } = require('../middleware/rateLimiter');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/register', authLimiter, register);
+router.post('/register', applyRateLimiter, register);
 
 /**
  * @swagger
@@ -86,7 +89,7 @@ router.post('/register', authLimiter, register);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post('/login', authLimiter, login);
+router.post('/login', applyRateLimiter, login);
 
 /**
  * @swagger

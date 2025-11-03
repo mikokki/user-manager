@@ -81,7 +81,6 @@ pnpm-lock.yaml
 *.tgz
 
 # dotenv environment variables file
-.env.test
 
 # Unit test / coverage reports
 *.lcov
